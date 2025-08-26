@@ -85,26 +85,22 @@
   (function(){
     const subTextEl = document.getElementById('thinking-subtext');
     const messages = [
-      'Analyzing with Python simulation...',
+  
       'Evaluating heuristics...',
-      'Running Minimax algorithm...',
+      'Running IDA* algorithm...',
       'Performing Monte-Carlo simulations...',
       'Checking board states...',
       'Detecting chains and loops...',
       'Applying corner and edge heuristics...',
-      'Assessing sacrifice moves...',
+      'calculating...',
       'Generating probabilistic outcomes...',
       'Optimizing move selection...',
-      'Calculating risk factors...',
-      'Scanning for traps...',
-      'Validating opponent\'s options...',
+    
       'Updating strategy matrix...',
       'Preparing final move...',
       'Almost done...',
-      'Move ready to execute!',
-      'বট কাজ করছে... একটু অপেক্ষা করুন!',
-      'Solver বুদ্ধি খাটাচ্ছে...',
-      'পাজেল বিশ্লেষণ হচ্ছে...'
+      'Move ready to execute!'
+      
     ];
     let idx = 0;
     function typeEffect(text, element, delay=40) {

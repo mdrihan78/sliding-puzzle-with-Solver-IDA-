@@ -1,8 +1,6 @@
-// Main UI event listeners: mode, start, modal, solver, keyboard, resize
+// Handles all UI event listeners and solver controls
 
 (function(){
-  const puzzleGame = window.puzzleGame;
-  const solverLogic = window.solverLogic;
   const homeScreen = document.getElementById('homeScreen');
   const gameContainer = document.getElementById('gameContainer');
   const gridEl = document.getElementById('grid');
@@ -11,34 +9,42 @@
   const closeModal = document.getElementById('closeModal');
   const solveBtn = document.getElementById('solveBtn');
   const controls = document.getElementById('controls');
-  // Mode Switch
+
   document.querySelectorAll('[data-mode]').forEach(el=>{
     el.addEventListener('click', ()=>{
-      puzzleGame.setMode(el.dataset.mode);
+      currentMode = el.dataset.mode;
+      const idx = ['easy','normal','hard'].indexOf(currentMode);
+      toggleSlider.style.left = `${idx*33.3333}%`;
     });
   });
-  // Start Button
+
   startBtn.addEventListener('click', ()=>{
     homeScreen.classList.add('hidden');
     gameContainer.classList.remove('hidden');
-    puzzleGame.createGrid(puzzleGame.modes[puzzleGame.getState().currentMode||'easy'].size);
+    createGrid(modes[currentMode].size);
   });
-  // Modal
+
   closeModal.addEventListener('click', ()=>{ modalOverlay.style.display = 'none'; });
-  // Tile Click
+
   gridEl.addEventListener('click', e=>{
     const tile = e.target.closest('.tile');
     if(!tile) return;
-    if(puzzleGame.tryMove(tile) && puzzleGame.isSolved(puzzleGame.getTiles())){
+    if(tryMove(tile) && isSolved(tiles)){
       modalOverlay.style.display = 'flex';
-      puzzleGame.updateProgressBar();
+      updateProgressBar();
     }
   });
-  // Resize
+
   window.addEventListener('resize', ()=>{
-    puzzleGame.renderGrid();
+    tiles.forEach(num=>{
+      if(num===null) return;
+      const tile = [...gridEl.children].find(t=>+t.dataset.number===num);
+      if(!tile) return;
+      const {x,y} = getTranslate(+tile.dataset.position);
+      tile.style.transform = `translate(${x}px,${y}px)`;
+    });
   });
-  // Solver logic
+
   solveBtn.addEventListener('click', function(){
     if(solverLogic.isRunning()) return;
     solveBtn.disabled = true;
@@ -47,26 +53,26 @@
       function solved(){
         solveBtn.disabled = false;
         gridEl.style.pointerEvents = '';
-        if(puzzleGame.isSolved(puzzleGame.getTiles())) modalOverlay.style.display = 'flex';
-        puzzleGame.updateProgressBar();
+        if(isSolved(tiles)) modalOverlay.style.display = 'flex';
+        updateProgressBar();
       },
       function fail(data){
         solveBtn.disabled = false;
         gridEl.style.pointerEvents = '';
         let msg = 'Solver failed or timed out.';
         if(data && data.method){
-          if(data.method.startsWith('4x4_stage1_fail')) msg="4x4 puzzle: got stuck in stage 1!";
-          else if(data.method.startsWith('4x4_stage2_fail')) msg="4x4 puzzle: got stuck in the final stage!";
-          else if(data.method.startsWith('5x5_stage1_fail')) msg="5x5 puzzle: got stuck in the first 12-tile stage!";
-          else if(data.method.startsWith('5x5_stage2_fail')) msg="5x5 puzzle: got stuck in the final stage!";
+          if(data.method.startsWith('4x4_stage1_fail')) msg="৪×৪ puzzle: ১-৬ tile stage-এ আটকে গেছে!";
+          else if(data.method.startsWith('4x4_stage2_fail')) msg="৪×৪ puzzle: শেষ stage-এ আটকে গেছে!";
+          else if(data.method.startsWith('5x5_stage1_fail')) msg="৫×৫ puzzle: ১ম ১২টা tile stage-এ আটকে গেছে!";
+          else if(data.method.startsWith('5x5_stage2_fail')) msg="৫×৫ puzzle: শেষ stage-এ আটকে গেছে!";
           else msg = 'Solver could not finish (method: '+data.method+').';
         }
         alert(msg);
       },
-      puzzleGame.getTiles,
-      puzzleGame.getGridSize,
-      puzzleGame.isSolved,
-      puzzleGame.tryMove
+      ()=>tiles.slice(),
+      ()=>size,
+      isSolved,
+      tryMove
     );
   });
   window.addEventListener('keydown', (e)=>{
@@ -74,4 +80,55 @@
     if(e.key === 'Escape' && solverLogic.isRunning()) solverLogic.stopSolverNow();
   });
   window.addEventListener('beforeunload', ()=>{ solverLogic.stopSolverNow(); });
+
+  // Typing effect for bot thinking status
+  (function(){
+    const subTextEl = document.getElementById('thinking-subtext');
+    const messages = [
+      'Analyzing with Python simulation...',
+      'Evaluating heuristics...',
+      'Running Minimax algorithm...',
+      'Performing Monte-Carlo simulations...',
+      'Checking board states...',
+      'Detecting chains and loops...',
+      'Applying corner and edge heuristics...',
+      'Assessing sacrifice moves...',
+      'Generating probabilistic outcomes...',
+      'Optimizing move selection...',
+      'Calculating risk factors...',
+      'Scanning for traps...',
+      'Validating opponent\'s options...',
+      'Updating strategy matrix...',
+      'Preparing final move...',
+      'Almost done...',
+      'Move ready to execute!',
+      'বট কাজ করছে... একটু অপেক্ষা করুন!',
+      'Solver বুদ্ধি খাটাচ্ছে...',
+      'পাজেল বিশ্লেষণ হচ্ছে...'
+    ];
+    let idx = 0;
+    function typeEffect(text, element, delay=40) {
+      return new Promise((resolve) => {
+        element.textContent = '';
+        let i = 0;
+        function typeChar() {
+          if(i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeChar, delay);
+          } else {
+            setTimeout(resolve, 1100);
+          }
+        }
+        typeChar();
+      });
+    }
+    async function loopMessages() {
+      while(true) {
+        await typeEffect(messages[idx], subTextEl);
+        idx = (idx + 1) % messages.length;
+      }
+    }
+    loopMessages();
+  })();
 })();

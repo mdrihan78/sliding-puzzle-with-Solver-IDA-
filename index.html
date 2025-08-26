@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sliding Puzzle Game</title>
+  <link rel="stylesheet" href="../src/css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Content is dynamically rendered by JS -->
+    <div id="homeScreen" class="w-full max-w-md p-8 rounded-3xl text-center mb-10 select-none">
+      <h1 class="text-white text-5xl font-extrabold mb-8 drop-shadow-lg">Sliding Puzzle Game</h1>
+      <div class="relative inline-block w-full bg-gray-800 rounded-full overflow-hidden shadow-inner">
+        <div id="toggleSlider" class="absolute top-0 left-0 rounded-full h-full w-1/3 transition-all duration-300 ease-in-out"></div>
+        <div class="flex text-gray-300 font-semibold text-xl cursor-pointer">
+          <div data-mode="easy" class="flex-1 py-4 z-10">Easy</div>
+          <div data-mode="normal" class="flex-1 py-4 z-10">Normal</div>
+          <div data-mode="hard" class="flex-1 py-4 z-10">Hard</div>
+        </div>
+      </div>
+      <button id="startBtn" class="mt-10 w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl text-2xl font-semibold shadow-lg transition duration-300">
+        Start Game
+      </button>
+      <p class="text-sm text-gray-400 mt-3">
+        After starting, run the <strong>Solve</strong> bot from below (or press <strong>B</strong> on your keyboard).
+      </p>
+    </div>
+
+    <div id="gameContainer" class="hidden w-full max-w-lg aspect-square rounded-3xl p-6 flex flex-col relative">
+      <div id="grid"></div>
+    </div>
+
+    <div id="progressBarWrap" style="display:none;">
+      <div>
+        <div id="progressBar"></div>
+        <div id="progressText"></div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <div id="thinkingSmall" aria-hidden="true"></div>
+      <div id="winner-message"></div>
+      <div id="game-board"></div>
+      <div id="thinking-container" role="status" aria-live="polite" aria-atomic="true" aria-label="Bot thinking status">
+        <div id="thinking-text">Solving With IDA*</div>
+        <button id="customPositionBtn" style="margin-top:14px;margin-bottom:0.5rem;background:#2d67b7;color:#fff;padding:0.49rem 1.2rem;border:none;border-radius:8px;font-size:1.08rem;font-weight:600;cursor:pointer;transition:background 0.13s;">Set Custom Position</button>
+      </div>
+      <div id="timer-wrap">
+        <span id="timer-label">Timer: </span><span id="timer-value">10</span> sec
+        <button id="shuffleBtn">Shuffle</button>
+      </div>
+      <button id="solveBtn" title="Bot Solve">Solve</button>
+    </div>
+
+    <div id="custom-position-modal">
+      <div id="custom-position-content">
+        <div style="font-size:1.25em;font-weight:700;color:#58a6ff;margin-bottom:9px;">Set Tile Value</div>
+        <label for="tile-value">Tile Number</label>
+        <select id="tile-value"></select>
+        <label for="tile-row">Row</label>
+        <select id="tile-row"></select>
+        <label for="tile-col">Column</label>
+        <select id="tile-col"></select>
+        <div class="note">
+          <b>Note:</b> To set empty tile, select <b>0</b> as tile number.
+        </div>
+        <div class="btns">
+          <button id="applyCustomPositionBtn">Apply</button>
+          <button class="close" id="closeCustomPositionBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalOverlay" class="flex">
+      <div id="modal">
+        <h2>🎉 You Solved It!</h2>
+        <p class="text-gray-300">Congratulations on completing the puzzle.</p>
+        <button id="closeModal">Close</button>
+      </div>
+    </div>
+
+    <div id="footer-note">
+      If the solver does not start within 10 seconds, please refresh the page.
+      <span>created by RAFSAN.</span>
+    </div>
+  </div>
+  <script src="../src/js/game.js"></script>
+  <script src="../src/js/solver.js"></script>
+  <script src="../src/js/customPosition.js"></script>
+  <script src="../src/js/timer.js"></script>
+  <script src="../src/js/ui.js"></script>
+</body>
+          </html>
